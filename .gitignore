@@ -59,4 +59,6 @@ dkms.conf
 *.out
 *.toc
 *.synctex.gz
+*.bbl
+*.blg
 LaTeX/build/main.pdf
