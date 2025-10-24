@@ -3,11 +3,12 @@
 % Importa tutti i pacchetti e le configurazioni
 \input{setup.tex}
 
-\title{}
-\author{Davide Donà \and
- Andrea Blushi}
+\title{Parallel EM (Expectation-Maximization) clustering for HPC}
+\author{Davide Donà - 264467 \and
+ Andrea Blushi - 264468}
 
-\date{}
+\date{\MonthName\ \number\year}
+
 \begin{document}
 
 %Title and table of contents
@@ -16,5 +17,10 @@
 \tableofcontents
 
 \newpage
+
+\input{src/Introduction.tex}
+\input{src/Parallel_design.tex}
+\input{src/Implementation.tex}
+\input{src/Scalability.tex}
 
 \end{document}
