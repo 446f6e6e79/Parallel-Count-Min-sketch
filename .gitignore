@@ -61,4 +61,6 @@ dkms.conf
 *.synctex.gz
 *.bbl
 *.blg
-LaTeX/build/main.pdf
+*/LaTeX/build/main.pdf
+
+.DS_Store

@@ -1,2 +1,2 @@
-# HPC-Exam
+# Parallel Count-Min sketch
 
