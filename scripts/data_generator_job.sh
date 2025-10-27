@@ -8,6 +8,4 @@
 
 module load python-3.10.14
 
-python3 ./HPC-Exam/data/data_generator.py 50 ./HPC-Exam/data/test
-
-find "$BASE_DIR" -type f \( -name "*.sh.e*" -o -name "*.sh.o*" \) -print -delete
+python3 ./HPC-Exam/data/data_generator.py 50 ./HPC-Exam/data/data.bin bin
