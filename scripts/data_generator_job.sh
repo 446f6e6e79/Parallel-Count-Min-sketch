@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=1:mem=2gb 
+
+# set max execution time
+#PBS -l walltime=0:01:00
+#set the queue  
+#PBS -q short_cpuQ    
+
+module load python-3.10.14
+
+python3 ./HPC-Exam/data/data_generator.py 50 ./HPC-Exam/data/test
+
+find "$BASE_DIR" -type f \( -name "*.sh.e*" -o -name "*.sh.o*" \) -print -delete
