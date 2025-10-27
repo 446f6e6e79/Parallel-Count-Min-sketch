@@ -5,8 +5,8 @@ WALLTIME="01:00:00"
 QUEUE="short_cpuQ"
 MEM="16gb"
 PLACEMENT="pack:excl"
-PARAMETERS="input_file.txt"
-
+PARAMETERS="inputName"
+EXECUTABLE="./Parallel-Count-Min-sketch/my_executable"   # Path from the home dir
 # List of "NODES:NCPUS" combinations to produce
 COMBOS=(
   "1:1"   # 1 cpu, 1 node.       -> P = 1
@@ -33,6 +33,7 @@ for combo in "${COMBOS[@]}"; do
        s/__WALLTIME__/$WALLTIME/g; \
        s/__QUEUE__/$QUEUE/g; \
        s/__NP__/$NP/g; \
+       s/__EXECUTABLE__/$EXECUTABLE/g; \
        s/__PARAMETERS__/$PARAMETERS/g; \
        s/__PLACEMENT__/$PLACEMENT/g" job_template.sh > "$out"
 

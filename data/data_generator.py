@@ -32,7 +32,7 @@ def main():
     if fmt not in ("text", "bin"):
         print("Format must be 'text' or 'bin'")
         sys.exit(1)
-
+    print(f"Generating {num_samples} random IPv4 addresses in {fmt} format to {output_file}...")
     if fmt == "text":
         with open(output_file, 'w') as f:
             for _ in range(num_samples):
@@ -43,6 +43,6 @@ def main():
             for _ in range(num_samples):
                 ip = rand_ipv4()
                 f.write(ipv4_to_packed(ip))
-
+    print("Data generation complete.")
 if __name__ == "__main__":
     main()
