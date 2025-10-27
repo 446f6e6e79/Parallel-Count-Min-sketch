@@ -61,6 +61,12 @@ dkms.conf
 *.synctex.gz
 *.bbl
 *.blg
-*/LaTeX/build/main.pdf
 
+*/LaTeX/build/main.pdf
 .DS_Store
+notes/
+
+# Ignoring the data files
+data/*.txt
+data/*.bin
+.vscode/tasks.json

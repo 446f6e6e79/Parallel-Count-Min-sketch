@@ -5,6 +5,7 @@ WALLTIME="01:00:00"
 QUEUE="short_cpuQ"
 MEM="16gb"
 PLACEMENT="pack:excl"
+PARAMETERS="input_file.txt"
 
 # List of "NODES:NCPUS" combinations to produce
 COMBOS=(
@@ -18,7 +19,9 @@ COMBOS=(
 )
 # Loop over each combination and generate the corresponding job script
 for combo in "${COMBOS[@]}"; do
+  # Split the combo into NODES and NCPUS
   IFS=":" read -r NODES NCPUS <<< "$combo"
+  # Compute the number of processes as NODES * NCPUS
   NP=$(( NODES * NCPUS ))
 
   # Generate job name dinamically, as job_run_<NODES>n_<NCPUS>c.sh
@@ -30,8 +33,10 @@ for combo in "${COMBOS[@]}"; do
        s/__WALLTIME__/$WALLTIME/g; \
        s/__QUEUE__/$QUEUE/g; \
        s/__NP__/$NP/g; \
+       s/__PARAMETERS__/$PARAMETERS/g; \
        s/__PLACEMENT__/$PLACEMENT/g" job_template.sh > "$out"
 
+  # Make the generated script executable
   chmod +x "$out"
   echo "Generated $out (NODES=$NODES NCPUS=$NCPUS NP=$NP)"
 

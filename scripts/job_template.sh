@@ -4,4 +4,4 @@
 #PBS -q __QUEUE__
 
 module load mpich-3.2
-mpirun.actual -n __NP__ ./HPCBencmarks/HPCBencmarks -l __PLACEMENT__
+mpirun.actual -n __NP__ ./HPCBencmarks/HPCBencmarks __PARAMETERS__ -l __PLACEMENT__
