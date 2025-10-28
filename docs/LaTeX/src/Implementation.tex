@@ -1,2 +1,42 @@
 \section{Implementation}
-\cite{Graham}
+
+\begin{algorithm}[H]
+\caption{Count-Min Sketch}
+\begin{algorithmic}[1]
+\Require Stream of elements $x_1, x_2, \dots, x_n$, error $\varepsilon$, failure probability $\delta$
+
+\State $w \gets \lceil e / \varepsilon \rceil$ \Comment{Number of columns}
+\State $d \gets \lceil \log(1/\delta) \rceil$ \Comment{Number of hash functions}
+\State Initialize $M[d][w] \gets 0$ \Comment{M is the CMS matrix}
+\State Choose uniformly at random two family of hash seed $a_i, b_i$ for $i = 1, \dots, d$
+
+\For{$i = 1$ to $n$}
+    \State \texttt{cms\_update(x\_i)}
+\EndFor
+\end{algorithmic}
+
+
+\end{algorithm}
+\begin{algorithm}[H]
+\caption{Count-Min Sketch Update}
+\begin{algorithmic}[1]
+\Require Element $x$ and CMS structure 
+\For{$i = 1$ to $d$}
+    \State $h_i(x) \gets ((a_i \cdot x + b_i) \bmod p) \bmod w$ \Comment {Compute hash value}
+    \State $M[i][h_i(x)] \gets M[i][h_i(x)] + 1$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Count-Min Sketch Query}
+\begin{algorithmic}[1]
+    \Require Element $x$ and CMS structure
+    \State $est \gets +\infty$  \Comment Minimum estimated frequency initialization
+    \For{$i = 1$ to $d$}
+        \State $h_i(x) \gets ((a_i \cdot x + b_i) \bmod p) \bmod w$ \Comment Compute hash value
+        \State $est \gets \min(est,\, M[i][h_i(x)])$
+    \EndFor
+    \State \Return $est$
+\end{algorithmic}
+\end{algorithm}
