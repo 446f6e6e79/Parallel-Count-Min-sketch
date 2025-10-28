@@ -10,5 +10,4 @@
 #include <math.h>
 #include <mpi.h>
 
-
 #endif

@@ -83,7 +83,14 @@ uint32_t cms_hash(CountMinSketch *cms, uint32_t x, int row) {
 }
 
 /*
-    Update the Count-Min-Sketch table for the current value x
+    Update the Count-Min Sketch table for a single value x
+
+    This function updates the counters in each row of the Count-Min Sketch
+    by hashing the value x for that row and incrementing the corresponding cell
+
+    Parameters:
+    cms - pointer to the Count-Min Sketch data structure
+    x   - the value to insert/update in the sketch (uint32_t, 32-bit unsigned integer)
 */
 void cms_update(CountMinSketch *cms, uint32_t x) {
     for (int row = 0; row < cms->depth; row++) {
@@ -93,8 +100,7 @@ void cms_update(CountMinSketch *cms, uint32_t x) {
 }
 
 /*
-
-
+    Debug function to print the Count-Min Sketch table occurrences
 */
 void cms_debug_print(CountMinSketch *cms) {
     int count = 0;
@@ -107,10 +113,17 @@ void cms_debug_print(CountMinSketch *cms) {
     printf("There are %d occurences\n", count);
 }
 
-
-
 /*
-    Batch update the Count-Min-Sketch table for an array of keys
+    Update the Count-Min Sketch with multiple keys at once
+
+    This function iterates over an array of keys, converts each key
+    (e.g., an IP address) into an integer representation, and updates
+    the Count-Min Sketch counters accordingly
+
+    Parameters:
+    cms    - pointer to the Count-Min Sketch data structure
+    keys   - pointer to the array of keys (each of size IP_SIZE)
+    n_keys - number of keys in the array
 */
 void cms_batch_update(CountMinSketch *cms, const uint8_t *keys, size_t n_keys) {
     for (size_t i = 0; i < n_keys; i++) {
@@ -133,6 +146,6 @@ void cms_free(CountMinSketch *cms) {
     Convert an IPv4-mapped address to a 32-bit integer
 */
 uint32_t ip_to_int(const uint8_t *ip_addr) {
-    // Assuming ip_addr is a valid IPv4-mapped IPv6 address
+    // Assuming ip_addr is a valid IPv4-mapped  address
     return (uint32_t)(ip_addr[12] << 24 | ip_addr[13] << 16 | ip_addr[14] << 8 | ip_addr[15]);
 }

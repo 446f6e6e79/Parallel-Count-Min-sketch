@@ -34,6 +34,7 @@ void cms_merge_into(CountMinSketch *dest, const CountMinSketch *src);
 
 // Convert IPV4 format into 32bit integer
 uint32_t ip_to_int(const uint8_t *inp);
+// Debug function to print the Count-Min Sketch table occurrences
 void cms_debug_print(CountMinSketch *cms);
 
 
