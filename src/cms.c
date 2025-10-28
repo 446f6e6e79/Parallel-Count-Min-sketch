@@ -101,19 +101,21 @@ void cms_debug_print(CountMinSketch *cms) {
     for (int row = 0; row < cms->depth; row++) {
         for (int col = 0; col < cms->width; col++) {
             if(cms->table[row * cms->width + col] > 0)
-                count++;
+                count += cms->table[row * cms->width + col]; 
         }
     }
-    printf("There are %d occurences", count);
+    printf("There are %d occurences\n", count);
 }
+
 
 
 /*
     Batch update the Count-Min-Sketch table for an array of keys
 */
-void cms_batch_update(CountMinSketch *cms, uint32_t *keys, size_t n_keys) {
+void cms_batch_update(CountMinSketch *cms, const uint8_t *keys, size_t n_keys) {
     for (size_t i = 0; i < n_keys; i++) {
-        cms_update(cms, keys[i]);
+        uint32_t key_int = ip_to_int(&keys[i * IP_SIZE]); 
+        cms_update(cms, key_int);
     }
 }
 

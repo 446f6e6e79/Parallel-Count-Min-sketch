@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define IP_SIZE 4 // Each IPv4 address is 4 bytes
 
 typedef struct {
     int width;       // columns
@@ -25,7 +26,7 @@ void cms_free(CountMinSketch *cms);
 
 // Update and query functions
 void cms_update(CountMinSketch *cms, uint32_t key);
-void cms_batch_update(CountMinSketch *cms, uint8_t *keys, size_t n_keys);
+void cms_batch_update(CountMinSketch *cms, const uint8_t *keys, size_t n_keys);
 uint32_t cms_query(const CountMinSketch *cms, uint32_t key);
 
 // Merge two Count-Min Sketches (src into dest)

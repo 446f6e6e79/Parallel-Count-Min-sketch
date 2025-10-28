@@ -8,4 +8,4 @@
 
 module load python-3.10.14
 
-python3 ./Parallel-Count-Min-sketch/data/data_generator.py 50 Parallel-Count-Min-sketch/data/data.bin bin 1800
+python3 ./Parallel-Count-Min-sketch/data/data_generator.py 52 Parallel-Count-Min-sketch/data/data.bin bin 

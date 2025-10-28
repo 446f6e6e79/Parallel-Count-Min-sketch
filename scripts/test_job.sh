@@ -6,4 +6,4 @@
 #set the queue  
 #PBS -q short_cpuQ   
 module load mpich-3.2
-mpirun.actual -n 5 ./HPC-Exam/src/comm
+mpirun.actual -n 5 ./Parallel-Count-Min-sketch/bin/CMsketch ./Parallel-Count-Min-sketch/data/data.bin
