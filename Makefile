@@ -7,7 +7,7 @@ LDFLAGS ?=
 TARGET := bin/CMsketch
 
 # Source files
-SRC := src/main.c src/csm.c src/file_io.c
+SRC := src/main.c src/cms.c src/file_io.c
 
 # Objects and dependency files
 OBJ := $(SRC:.c=.o)

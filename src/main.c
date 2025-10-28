@@ -1,8 +1,6 @@
 #include "main.h"
 
 
-#define IP_SIZE 16
-
 int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
 
@@ -12,14 +10,23 @@ int main(int argc, char **argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    MPI_Offset offset = 0;
     MPI_Offset file_size = 0;
+    MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+    if(fh == MPI_FILE_NULL) {
+        fprintf(stderr, "Error opening file %s\n", argv[1]);
+        MPI_File_close(&fh);
+        MPI_Finalize();
+        return -1;
+    }
     MPI_File_get_size(fh, &file_size);
 
     if(file_size % IP_SIZE != 0) {
         if (rank == 0) {
             fprintf(stderr, "File size is not a multiple of IP address size\n");
         }
+        MPI_File_close(&fh);
+        MPI_Finalize();
         return -1;
     }
 
@@ -34,6 +41,8 @@ int main(int argc, char **argv) {
     uint8_t *buffer = malloc(count * IP_SIZE);
     if(!buffer) {
         fprintf(stderr, "Error allocating memory for buffer on rank %d\n", rank);
+        MPI_File_close(&fh);
+        free(buffer);
         MPI_Finalize();
         return -1;
     }
@@ -42,6 +51,8 @@ int main(int argc, char **argv) {
 
     if (addresses_read == -1) { 
         fprintf(stderr, "Error reading buffer on rank %d\n", rank);
+        MPI_File_close(&fh);
+        free(buffer);
         MPI_Finalize();
         return -1;
     }
