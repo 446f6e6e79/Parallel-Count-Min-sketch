@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # Setup common parameters for the multiple job submission
-BASE_DIR="Parallel-Count-Min-sketch"
+BASE_DIR="$HOME/Parallel-Count-Min-sketch"
 WALLTIME="01:00:00"
 QUEUE="short_cpuQ"
 MEM="16gb"
 PLACEMENT="pack:excl"
 PARAMETERS="parameter_for_program"
+
 EXECUTABLE="${BASE_DIR}/bin/CMsketch"      # Path to the executable file
 TEMPLATE="${BASE_DIR}/scripts/job_template.sh"
 

@@ -6,6 +6,11 @@
 #set the queue  
 #PBS -q short_cpuQ    
 
+EXECUTABLE_PATH=./Parallel-Count-Min-sketch/data/data_generator.py
+NUMBER_OF_IPS=52
+OUTPUT_PATH=./Parallel-Count-Min-sketch/data/data.bin
+FILE_TYPE=bin
+RUN_FOR_SECONDS=1800. # run for 30 minutes, ignoring the data size
 module load python-3.10.14
 
-python3 ./Parallel-Count-Min-sketch/data/data_generator.py 52 Parallel-Count-Min-sketch/data/data.bin bin 
+python3 $EXECUTABLE_PATH $NUMBER_OF_IPS $OUTPUT_PATH $FILE_TYPE
