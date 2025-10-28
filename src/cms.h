@@ -4,7 +4,14 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef struct CountMinSketch CountMinSketch;
+typedef struct {
+    int width;       // columns
+    int depth;       // rows
+    uint32_t **table;   // 2D array for counts
+    uint32_t *hash_a;   // Universal hash function parameters: we need two hash seeds
+    uint32_t *hash_b;
+    uint32_t prime;     // A large prime number for hashing
+} CountMinSketch;
 
 // Functions to create and free Count-Min Sketch
 CountMinSketch *cms_create(int width, int depth);

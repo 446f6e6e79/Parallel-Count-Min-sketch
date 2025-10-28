@@ -1,17 +1,5 @@
 #include "cms.h"
 
-/*
-    Definition of CountMinSketch structure
-*/
-struct CountMinSketch {
-    int width;       // columns
-    int depth;       // rows
-    uint32_t *table;   // array for counts
-    uint32_t *hash_a;   // Universal hash function parameters: we need two hash seeds
-    uint32_t *hash_b;
-    uint32_t prime;     // A large prime number for hashing
-};
-
 /* 
     Create a Count-Min Sketch from the given error parameters
    - epsilon: The desired error rate (probabilistic)
