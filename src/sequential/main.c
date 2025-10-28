@@ -27,8 +27,10 @@ void cms_free(CountMinSketch *cms);
     https://github.com/alabid/countminsketch/blob/master/count_min_sketch.cpp# CHOOSED HASH
 */
 
-/*
-    Initialize Count-Min Sketch structure
+/* 
+    Create a Count-Min Sketch from the given error parameters
+   - epsilon: The desired error rate (probabilistic)
+   - delta: The desired confidence level (probabilistic)
 */
 CountMinSketch *cms_create_from_error(double epsilon, double delta) {
     if (epsilon <= 0.0 || delta <= 0.0 || delta >= 1.0) return NULL;
@@ -41,45 +43,78 @@ CountMinSketch *cms_create_from_error(double epsilon, double delta) {
     return cms_create(w, d);
 }
 
-CountMinSketch *cms_create(int width, int depth) {
+/* 
+    Create a Count-Min Sketch from the given width and depth parameters
+    - width: number of columns
+    - depth: number of rows (hash functions)
+*/
+CountMinSketch * cms_create(int width, int depth) {
     if (width < 1) width = 1;
     if (depth < 1) depth = 1;
+    
     // Allocate memory for CountMinSketch structure
     CountMinSketch *cms = malloc(sizeof(CountMinSketch));
+    if (cms == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for CountMinSketch structure.\n");
+        return NULL;
+    }
     cms->width = width;
     cms->depth = depth;
-    // Allocate table as a contiguous block, initialize to zero (calloc)
+    // Allocate the cms table, initialized as zeros
     cms->table = calloc(width * depth, sizeof(uint32_t));
-    // Allocate hash function parameters
+    if (cms->table == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for table.\n");
+        free(cms);
+        return NULL;
+    }
+    /* 
+        Allocate hash function parameters. Every hash function will use
+        2 parameters and the table needs n_rows many hash functions.
+        This way we can define a family of pairwise indipendent functions
+    */
     cms->hash_a = malloc(depth * sizeof(uint32_t));
+    if (cms->hash_a == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for hash_a.\n");
+        free(cms->table);
+        free(cms);
+        return NULL;
+    }
     cms->hash_b = malloc(depth * sizeof(uint32_t));
-    srand(0); // Seed for reproducibility
+    if (cms->hash_b == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for hash_b.\n");
+        free(cms->hash_a);
+        free(cms->table);
+        free(cms);
+        return NULL;
+    }
+    srand(0);
     // Use a large prime number
     cms->prime = 4294967291U;
-    // Initialize hash function arrays
+    
+    // Initialize parameters for all hash functions 
     for (int i = 0; i < depth; i++) {
         cms->hash_a[i] = rand() % cms->prime;
         cms->hash_b[i] = rand() % cms->prime;
     }
-    // Create the Count-Min Sketch with calculated dimensions
     return cms;
 }
 
-
 /*
-    Universal hash function for Count-Min Sketch
+    Universal Hash function for Count-Min Sketch.
+        h_a,b(x) = ax + b
+    The function must return an index [0, width - 1]
 */
-uint32_t cms_hash(CountMinSketch *cms, uint32_t ip, int row) {
+uint32_t cms_hash(CountMinSketch *cms, uint32_t x, int row) {
     // hash_a * item + hash_b mod prime mod width
-    return ((cms->hash_a[row] * ip + cms->hash_b[row]) % cms->prime) % cms->width;
+    return ((cms->hash_a[row] * x + cms->hash_b[row]) % cms->prime) % cms->width;
 }
 
 /*
-    Update Count-Min Sketch with an item
+    Update the Count-Min-Sketch table for the current value x
 */
-void cms_update(CountMinSketch *cms, uint32_t ip) {
+void cms_update(CountMinSketch *cms, uint32_t x) {
     for (int row = 0; row < cms->depth; row++) {
-        int column = cms_hash(cms, ip, row);
+        int column = cms_hash(cms, x, row);
         cms->table[row * cms->width + column]++;
     }
 }
@@ -87,10 +122,10 @@ void cms_update(CountMinSketch *cms, uint32_t ip) {
 /*  
     Query the estimated the minimum count of an item
 */
-uint32_t cms_estimate(CountMinSketch *cms, uint32_t ip) {
+uint32_t cms_estimate(CountMinSketch *cms, uint32_t x) {
     uint32_t min_count = UINT32_MAX;
     for (int i = 0; i < cms->depth; i++) {
-        int col = cms_hash(cms, ip, i);
+        int col = cms_hash(cms, x, i);
         if (cms->table[i * cms->width + col] < min_count)
             min_count = cms->table[i * cms->width + col];
     }

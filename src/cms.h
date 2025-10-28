@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <math.h>
+#include <stdio.h>
 
 typedef struct {
     int width;       // columns

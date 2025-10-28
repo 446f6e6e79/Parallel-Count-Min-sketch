@@ -27,17 +27,39 @@ CountMinSketch * cms_create(int width, int depth) {
     
     // Allocate memory for CountMinSketch structure
     CountMinSketch *cms = malloc(sizeof(CountMinSketch));
+    if (cms == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for CountMinSketch structure.\n");
+        return NULL;
+    }
     cms->width = width;
     cms->depth = depth;
     // Allocate the cms table, initialized as zeros
     cms->table = calloc(width * depth, sizeof(uint32_t));
+    if (cms->table == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for table.\n");
+        free(cms);
+        return NULL;
+    }
     /* 
         Allocate hash function parameters. Every hash function will use
         2 parameters and the table needs n_rows many hash functions.
         This way we can define a family of pairwise indipendent functions
     */
     cms->hash_a = malloc(depth * sizeof(uint32_t));
+    if (cms->hash_a == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for hash_a.\n");
+        free(cms->table);
+        free(cms);
+        return NULL;
+    }
     cms->hash_b = malloc(depth * sizeof(uint32_t));
+        if (cms->hash_b == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for hash_b.\n");
+        free(cms->hash_a);
+        free(cms->table);
+        free(cms);
+        return NULL;
+    }
     srand(0);
     // Use a large prime number
     cms->prime = 4294967291U;
@@ -47,7 +69,7 @@ CountMinSketch * cms_create(int width, int depth) {
         cms->hash_a[i] = rand() % cms->prime;
         cms->hash_b[i] = rand() % cms->prime;
     }
-
+    
     return cms;
 }
 
