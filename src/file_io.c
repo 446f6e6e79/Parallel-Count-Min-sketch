@@ -1,4 +1,4 @@
-#include "fileReading.h"
+#include "file_io.h"
 
 /*
     Read IP addresses from a binary file using MPI I/O
@@ -36,14 +36,32 @@ int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset
     Each execution will append a new line to the file.
     TODO: since multiple processes could write on this file, implement locking structure
 */
-int write_file(const char *filename, int n_process, size_t total_size, double time_seconds) {
+int write_execution_info(const char *filename, int n_process, size_t total_size, double time_seconds) {
     // Open the file in append mode
     FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
         fprintf(stderr, "File size is not a multiple of IP address size\n");
         return -1;
     }
+
+    // Getting the POSIX file descriptor from the FILE pointer
+    int fd = fileno(fp);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to get file descriptor\n");
+        fclose(fp);
+        return -1;
+    }
+    // Lock the file for exclusive access
+    if (flock(fd, LOCK_EX) == -1) {
+        fprintf(stderr, "Failed to lock file\n");
+        fclose(fp);
+        return -1;
+    }
+
     fprintf(fp, "%d,%zu,%.6f\n", n_process, total_size, time_seconds);
+    
+    // Release lock and close the file
+    flock(fd, LOCK_UN);       
     fclose(fp);
     return 0;
 }

@@ -70,3 +70,4 @@ notes/
 data/*.txt
 data/*.bin
 .vscode/tasks.json
+.vscode/settings.json
