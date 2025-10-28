@@ -93,6 +93,15 @@ void cms_update(CountMinSketch *cms, uint32_t x) {
 }
 
 /*
+    Batch update the Count-Min-Sketch table for an array of keys
+*/
+void cms_batch_update(CountMinSketch *cms, uint32_t *keys, size_t n_keys) {
+    for (size_t i = 0; i < n_keys; i++) {
+        cms_update(cms, keys[i]);
+    }
+}
+
+/*
     Free all the memory allocated for Count-Min Sketch
 */
 void cms_free(CountMinSketch *cms) {

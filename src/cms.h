@@ -21,7 +21,8 @@ CountMinSketch *cms_create_from_error(double eps, double delta);
 void cms_free(CountMinSketch *cms);
 
 // Update and query functions
-void cms_update(CountMinSketch *cms, uint32_t key, uint32_t count);
+void cms_update(CountMinSketch *cms, uint32_t key);
+void cms_batch_update(CountMinSketch *cms, uint32_t *keys, size_t n_keys);
 uint32_t cms_query(const CountMinSketch *cms, uint32_t key);
 
 // Merge two Count-Min Sketches (src into dest)
