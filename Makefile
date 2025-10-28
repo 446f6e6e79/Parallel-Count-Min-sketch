@@ -1,7 +1,7 @@
 # MPI compiler and flags
 MPICC ?= mpicc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra -I./src
-LDFLAGS ?=
+LDFLAGS ?= -lm
 
 # Target binary executable
 TARGET := bin/CMsketch

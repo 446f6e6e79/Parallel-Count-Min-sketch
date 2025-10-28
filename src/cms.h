@@ -5,11 +5,14 @@
 #include <stddef.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 
 typedef struct {
     int width;       // columns
     int depth;       // rows
-    uint32_t **table;   // 2D array for counts
+    uint32_t *table;   // 2D array for counts
     uint32_t *hash_a;   // Universal hash function parameters: we need two hash seeds
     uint32_t *hash_b;
     uint32_t prime;     // A large prime number for hashing
@@ -22,7 +25,7 @@ void cms_free(CountMinSketch *cms);
 
 // Update and query functions
 void cms_update(CountMinSketch *cms, uint32_t key);
-void cms_batch_update(CountMinSketch *cms, uint32_t *keys, size_t n_keys);
+void cms_batch_update(CountMinSketch *cms, uint8_t *keys, size_t n_keys);
 uint32_t cms_query(const CountMinSketch *cms, uint32_t key);
 
 // Merge two Count-Min Sketches (src into dest)
