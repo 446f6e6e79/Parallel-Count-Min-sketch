@@ -6,7 +6,7 @@ QUEUE="short_cpuQ"
 MEM="16gb"
 PLACEMENT="pack:excl"
 PARAMETERS="inputName"
-EXECUTABLE="./Parallel-Count-Min-sketch/my_executable"   # Path from the home dir
+EXECUTABLE="./Parallel-Count-Min-sketch/src"   # Path from the home dir
 # List of "NODES:NCPUS" combinations to produce
 COMBOS=(
   "1:1"   # 1 cpu, 1 node.       -> P = 1

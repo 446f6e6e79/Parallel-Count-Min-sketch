@@ -93,6 +93,22 @@ void cms_update(CountMinSketch *cms, uint32_t x) {
 }
 
 /*
+
+
+*/
+void cms_debug_print(CountMinSketch *cms) {
+    int count = 0;
+    for (int row = 0; row < cms->depth; row++) {
+        for (int col = 0; col < cms->width; col++) {
+            if(cms->table[row * cms->width + col] > 0)
+                count++;
+        }
+    }
+    printf("There are %d occurences", count);
+}
+
+
+/*
     Batch update the Count-Min-Sketch table for an array of keys
 */
 void cms_batch_update(CountMinSketch *cms, uint32_t *keys, size_t n_keys) {
@@ -109,4 +125,12 @@ void cms_free(CountMinSketch *cms) {
     free(cms->hash_a);
     free(cms->hash_b);
     free(cms);      
+}
+
+/*
+    Convert an IPv4-mapped address to a 32-bit integer
+*/
+uint32_t ip_to_int(const uint8_t *ip_addr) {
+    // Assuming ip_addr is a valid IPv4-mapped IPv6 address
+    return (uint32_t)(ip_addr[12] << 24 | ip_addr[13] << 16 | ip_addr[14] << 8 | ip_addr[15]);
 }

@@ -28,4 +28,9 @@ uint32_t cms_query(const CountMinSketch *cms, uint32_t key);
 // Merge two Count-Min Sketches (src into dest)
 void cms_merge_into(CountMinSketch *dest, const CountMinSketch *src);
 
+// Convert IPV4 format into 32bit integer
+uint32_t ip_to_int(const uint8_t *inp);
+void cms_debug_print(CountMinSketch *cms);
+
+
 #endif

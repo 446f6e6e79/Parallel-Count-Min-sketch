@@ -34,7 +34,6 @@ int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset
     The file format is:
         n_process,total_size,time_seconds
     Each execution will append a new line to the file.
-    TODO: since multiple processes could write on this file, implement locking structure
 */
 int write_execution_info(const char *filename, int n_process, size_t total_size, double time_seconds) {
     // Open the file in append mode
