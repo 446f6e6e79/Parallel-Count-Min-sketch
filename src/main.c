@@ -1,6 +1,4 @@
 #include "main.h"
-#include "file_io.h"
-#include "cms.h"
 
 int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);

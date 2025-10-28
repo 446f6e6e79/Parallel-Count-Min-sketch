@@ -1,13 +1,31 @@
-# MPI Compiler settings
-MPICC = mpicc
-MPIFLAGS = -Wall -O2
+# MPI compiler and flags
+MPICC ?= mpicc
+CFLAGS ?= -std=c11 -O2 -Wall -Wextra -I./src
+LDFLAGS ?=
 
-# Load the module for MPI if needed
-module load mpich-3.2
+# Target binary executable
+TARGET := bin/CMsketch
 
-# Program name
-TARGET = mpi_program
+# Source files
+SRC := src/main.c src/csm.c src/file_io.c
 
-# Source files (add your .c files here)
-SRC = main.c
+# Objects and dependency files
+OBJ := $(SRC:.c=.o)
+DEPS := $(OBJ:.o=.d)
 
+.PHONY: all clean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	@mkdir -p $(dir $@)
+	$(MPICC) $(LDFLAGS) -o $@ $(OBJ)
+
+# Generic rule: compile .c -> .o and generate deps
+%.o: %.c
+	$(MPICC) $(CFLAGS) -c $< -o $@ -MMD -MP
+
+-include $(DEPS)
+
+clean:
+	rm -f $(OBJ) $(DEPS) $(TARGET)
