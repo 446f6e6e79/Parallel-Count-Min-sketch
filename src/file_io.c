@@ -1,0 +1,49 @@
+#include "fileReading.h"
+
+/*
+    Read IP addresses from a binary file using MPI I/O
+    The function takes as input:
+        fh: MPI file handle
+        buffer: pre-allocated buffer to store the read addresses
+        start_index: the starting index (in number of addresses) to read from
+        count: number of addresses to read
+    The function returns the number of addresses read, or -1 on error.
+*/
+int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count) {
+    // Calculate byte offset from the start of the file
+    MPI_Offset offset = start_index * IP_SIZE;
+    MPI_Offset bytes_to_read = count * (MPI_Offset)IP_SIZE;
+
+    // Read this process's local_addresses
+    MPI_Status status;
+    MPI_File_read_at(fh, offset, buffer, bytes_to_read, MPI_BYTE, &status);
+
+    // Compute how many bytes were actually read
+    int bytes_read = 0;
+    MPI_Get_count(&status, MPI_BYTE, &bytes_read);
+    
+    if (bytes_read != bytes_to_read) {
+        fprintf(stderr, "Error: Process failed to read the expected number of bytes. Expected %lld, got %d\n", bytes_to_read, bytes_read);
+        return -1;
+    }
+    return (int)(bytes_read / IP_SIZE); // Return number of addresses read
+}
+
+/*
+    Write the execution information to the output csv file
+    The file format is:
+        n_process,total_size,time_seconds
+    Each execution will append a new line to the file.
+    TODO: since multiple processes could write on this file, implement locking structure
+*/
+int write_file(const char *filename, int n_process, size_t total_size, double time_seconds) {
+    // Open the file in append mode
+    FILE *fp = fopen(filename, "a");
+    if (fp == NULL) {
+        fprintf(stderr, "File size is not a multiple of IP address size\n");
+        return -1;
+    }
+    fprintf(fp, "%d,%zu,%.6f\n", n_process, total_size, time_seconds);
+    fclose(fp);
+    return 0;
+}
