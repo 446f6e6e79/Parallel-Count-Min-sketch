@@ -102,8 +102,8 @@ int main(int argc, char **argv) {
     while (total_read < count) {
         // Remaining IPs to read for this process
         MPI_Offset remaining = count - total_read;
-        // Number of IPs to read in this batch (max BUFFER_IPS)
-        MPI_Offset current_count = (remaining > BUFFER_IPS) ? BUFFER_IPS : remaining;
+        // Number of IPs to read in this batch (max BUFFER_IP_COUNT)
+        MPI_Offset current_count = (remaining > BUFFER_IP_COUNT) ? BUFFER_IP_COUNT : remaining;
         // Starting index for this batch
         MPI_Offset current_start = start_index + total_read;
 
@@ -117,7 +117,6 @@ int main(int argc, char **argv) {
             MPI_Finalize();
             return -1;
         }
-
         cms_batch_update(cms, buffer, addresses_read);
         total_read += addresses_read;
     }
@@ -126,7 +125,6 @@ int main(int argc, char **argv) {
 
     // Debugging prints
     printf("Rank %d processed %lld addresses.\n", rank, total_read);
-    cms_debug_print(cms);
 
     // Cleanup
     free(buffer);
