@@ -10,10 +10,10 @@
 */
 
 int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count) {
-    // Ensure start_index does not exceed BUFFER_SIZE
-    if (start_index >= BUFFER_SIZE) {
-        fprintf(stderr, "Error: start_index (%lld) exceeds BUFFER_SIZE (%d)\n",
-                (long long)start_index, BUFFER_SIZE);
+    // Ensure we do not read more than the buffer can hold
+    if (count > BUFFER_IPS) {
+        fprintf(stderr, "Error: trying to read %lld addresses but buffer can hold only %d\n",
+                (long long)count, BUFFER_IPS);
         return -1;
     }
 

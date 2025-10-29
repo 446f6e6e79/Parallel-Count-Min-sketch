@@ -94,16 +94,17 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-
-
     // Initialize Count-Min Sketch
     CountMinSketch *cms = cms_create_from_error(epsilon, delta);
     
     // Chunked reading and processing
     MPI_Offset total_read = 0;
     while (total_read < count) {
+        // Remaining IPs to read for this process
         MPI_Offset remaining = count - total_read;
+        // Number of IPs to read in this batch (max BUFFER_IPS)
         MPI_Offset current_count = (remaining > BUFFER_IPS) ? BUFFER_IPS : remaining;
+        // Starting index for this batch
         MPI_Offset current_start = start_index + total_read;
 
         // Read the assigned portion of the file into the buffer
@@ -124,7 +125,7 @@ int main(int argc, char **argv) {
     end_time = MPI_Wtime();
 
     // Debugging prints
-    printf("Rank %d processed %d addresses.\n", rank, addresses_read);
+    printf("Rank %d processed %lld addresses.\n", rank, total_read);
     cms_debug_print(cms);
 
     // Cleanup
