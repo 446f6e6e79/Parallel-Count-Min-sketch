@@ -86,29 +86,40 @@ int main(int argc, char **argv) {
     MPI_Offset count = base_address + (rank < remainder ? 1 : 0);
 
     // Allocate buffer to read IP addresses. Each process has its own buffer.
-    uint8_t *buffer = malloc(count * IP_SIZE);
+    uint8_t *buffer = malloc(BUFFER_SIZE);
     if(!buffer) {
         fprintf(stderr, "Error allocating memory for buffer on rank %d\n", rank);
         MPI_File_close(&fh);
         MPI_Finalize();
         return -1;
     }
-    // TO DO: enormous buffer handler
-    // Read the assigned portion of the file into the buffer
-    int addresses_read = read_buffer(fh, buffer, start_index, count);
-    if (addresses_read == -1) { 
-        fprintf(stderr, "Error reading buffer on rank %d\n", rank);
-        MPI_File_close(&fh);
-        free(buffer);
-        MPI_Finalize();
-        return -1;
-    }
+
+
 
     // Initialize Count-Min Sketch
     CountMinSketch *cms = cms_create_from_error(epsilon, delta);
     
-    // Batch update Count-Min Sketch with the read IP addresses
-    cms_batch_update(cms, buffer, addresses_read);
+    // Chunked reading and processing
+    MPI_Offset total_read = 0;
+    while (total_read < count) {
+        MPI_Offset remaining = count - total_read;
+        MPI_Offset current_count = (remaining > BUFFER_IPS) ? BUFFER_IPS : remaining;
+        MPI_Offset current_start = start_index + total_read;
+
+        // Read the assigned portion of the file into the buffer
+        int addresses_read = read_buffer(fh, buffer, current_start, current_count);
+        if (addresses_read == -1) {
+            fprintf(stderr, "Error reading buffer on rank %d\n", rank);
+            free(buffer);
+            MPI_File_close(&fh);
+            cms_free(cms);
+            MPI_Finalize();
+            return -1;
+        }
+
+        cms_batch_update(cms, buffer, addresses_read);
+        total_read += addresses_read;
+    }
 
     end_time = MPI_Wtime();
 

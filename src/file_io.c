@@ -10,7 +10,13 @@
 */
 
 int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count) {
-    //TODO: Check that the start_index <= BUFFER_SIZE specified in the header
+    // Ensure start_index does not exceed BUFFER_SIZE
+    if (start_index >= BUFFER_SIZE) {
+        fprintf(stderr, "Error: start_index (%lld) exceeds BUFFER_SIZE (%d)\n",
+                (long long)start_index, BUFFER_SIZE);
+        return -1;
+    }
+
     // Calculate byte offset from the start of the file
     MPI_Offset offset = start_index * IP_SIZE;
     MPI_Offset bytes_to_read = count * (MPI_Offset)IP_SIZE;
