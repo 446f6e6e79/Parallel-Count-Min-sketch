@@ -132,20 +132,5 @@ void cms_batch_update(CountMinSketch *cms, const uint8_t *keys, size_t n_keys) {
     }
 }
 
-/*
-    Free all the memory allocated for Count-Min Sketch
-*/
-void cms_free(CountMinSketch *cms) {
-    free(cms->table);
-    free(cms->hash_a);
-    free(cms->hash_b);
-    free(cms);      
-}
 
-/*
-    Convert an IPv4-mapped address to a 32-bit integer
-*/
-uint32_t ip_to_int(const uint8_t *ip_addr) {
-    // Assuming ip_addr is a valid IPv4-mapped  address
-    return (uint32_t)(ip_addr[12] << 24 | ip_addr[13] << 16 | ip_addr[14] << 8 | ip_addr[15]);
-}
+

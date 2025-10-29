@@ -4,7 +4,6 @@
     The program reads IP addresses from a binary file in parallel,
     updates a Count-Min Sketch data structure, and prints debugging information.
     Usage: mpirun -n <num_processes> ./CMsketch <input_file> <output_file> <epsilon> <delta>
-    TODO: create a function to print error messages, that handle also the communication closage
 */
 
 int main(int argc, char **argv) {
@@ -51,7 +50,7 @@ int main(int argc, char **argv) {
     MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
     if(fh == MPI_FILE_NULL) {
         fprintf(stderr, "Error opening file %s\n", argv[1]);
-        MPI_Finalize();
+        safe_cleanup(NULL, NULL, NULL);
         return -1;
     }
 
@@ -62,8 +61,7 @@ int main(int argc, char **argv) {
         if (rank == 0) {
             fprintf(stderr, "File size is not a multiple of IP address size\n");
         }
-        MPI_File_close(&fh);
-        MPI_Finalize();
+        safe_cleanup(NULL, NULL, &fh);
         return -1;
     }
 
@@ -84,8 +82,7 @@ int main(int argc, char **argv) {
     uint8_t *buffer = malloc(BUFFER_SIZE);
     if(!buffer) {
         fprintf(stderr, "Error allocating memory for buffer on rank %d\n", rank);
-        MPI_File_close(&fh);
-        MPI_Finalize();
+        safe_cleanup(NULL, NULL, &fh);
         return -1;
     }
 
@@ -106,10 +103,7 @@ int main(int argc, char **argv) {
         int addresses_read = read_buffer(fh, buffer, current_start, current_count);
         if (addresses_read == -1) {
             fprintf(stderr, "Error reading buffer on rank %d\n", rank);
-            free(buffer);
-            MPI_File_close(&fh);
-            cms_free(cms);
-            MPI_Finalize();
+            safe_cleanup(buffer, cms, &fh);
             return -1;
         }
         cms_batch_update(cms, buffer, addresses_read);
@@ -121,16 +115,12 @@ int main(int argc, char **argv) {
     // Debugging prints
     printf("Rank %d processed %lld addresses.\n", rank, total_read);
 
-    // Cleanup
-    free(buffer);
-    MPI_File_close(&fh);
-    cms_free(cms);
-
     //Log the info about the runtime
     if(rank == 0){
         write_execution_info(argv[2], comm_sz, total_addresses, end_time - start_time);
     }
     
-    MPI_Finalize();
+    // Cleanup allocated resources
+    safe_cleanup(buffer, cms, &fh);
     return 0;
 }
