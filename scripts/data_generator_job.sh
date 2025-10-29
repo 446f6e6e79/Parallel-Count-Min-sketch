@@ -1,13 +1,13 @@
 #!/bin/bash
-#PBS -l select=1:ncpus=1:mem=2gb 
+#PBS -l select=1:ncpus=1:mem=64gb 
 
 # set max execution time
-#PBS -l walltime=0:01:00
+#PBS -l walltime=5:00:00
 #set the queue  
 #PBS -q short_cpuQ    
 
 EXECUTABLE_PATH=./Parallel-Count-Min-sketch/data/data_generator.py
-NUMBER_OF_IPS=52
+NUMBER_OF_IPS=1020848630
 OUTPUT_PATH=./Parallel-Count-Min-sketch/data/data.bin
 FILE_TYPE=bin
 RUN_FOR_SECONDS=1800. # run for 30 minutes, ignoring the data size

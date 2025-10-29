@@ -1,46 +1,51 @@
 #!/usr/bin/env python3
 import sys
 import random
-import socket
 import time
 
-def rand_ipv4():
+def rand_ipv4_string_batch(n):
     """
-        Generate a random IPv4 address in dotted-quad string format.
+        Generate a batch of random IPv4 addresses as strings.
+        INPUT:
+            - n -> number of elements in the batch
+        RETURNS:
+            array of n random IPv4 addresses in string format
     """
-    first = random.randint(1, 254)
-    return "{}.{}.{}.{}".format(first, random.randint(0,255), random.randint(0,255), random.randint(0,255))
+    return [
+        f"{random.randint(1, 254)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}"
+        for _ in range(n)
+    ]
 
-def ipv4_to_packed(ip_str):
+def rand_ipv4_bin_batch(n):
     """
-        Convert dotted-quad string to 4-byte packed binary format.
-        This way, each IP address takes exactly 4 bytes in binary file, making
-        it fixed-width and easier to implement efficient reading.
+        Generate a batch of random IPv4 addresses in packed binary format.
+        INPUT:
+            - n -> number of elements in the batch
+        RETURNS:
+            bytearray of n random IPv4 addresses in packed binary format
     """
-    return socket.inet_aton(ip_str)  
+    # 4 bytes per IP, generated from os.urandom (faster than inet_aton per IP)
+    data = bytearray()
+    for _ in range(n):
+        data += bytes([random.randint(1, 254), random.randint(0, 255),
+                       random.randint(0, 255), random.randint(0, 255)])
+    return data
 
 def main():
-    """
-        - Usage: python data_generator.py <num_samples> <output_file> [text|bin] [duration_seconds]
-          If duration_seconds is given (integer), the script ignores num_samples and runs
-          appending generated records until duration_seconds have elapsed.
-    """
     if len(sys.argv) < 3 or len(sys.argv) > 5:
         print("Usage: python data_generator.py <num_samples> <output_file> [text|bin] [duration_seconds]")
         sys.exit(1)
-
-    # Get the number of samples to generate
+    
+    # Parse arguments
     try:
         num_samples = int(sys.argv[1])
     except ValueError:
         print("First argument must be an integer (num_samples)")
         sys.exit(1)
-    # Get the output file and format
+
     output_file = sys.argv[2]
-    # By default, use text format
     file_format = sys.argv[3] if len(sys.argv) >= 4 else "text"
-    
-    # Get duration if provided
+
     duration = None
     if len(sys.argv) == 5:
         try:
@@ -51,37 +56,35 @@ def main():
             print("duration_seconds must be a positive integer")
             sys.exit(1)
 
-    print("Generating {} IPv4 addresses in {} format to {}...".format(
-          ("up to "+str(num_samples)) if duration is None else "for {} seconds".format(duration),
-          file_format, output_file))
-    
-    # Check if a duration is specified
-    if duration:
-        # duration mode: append until time expires
-        endtime = time.time() + duration
-        if file_format == "text":
-            with open(output_file, 'w') as f:
-                while time.time() < endtime:
-                    ip = rand_ipv4()
-                    f.write("{}\n".format(ip))
-        else:
-            with open(output_file, 'wb') as f:
-                while time.time() < endtime:
-                    ip = rand_ipv4()
-                    f.write(ipv4_to_packed(ip))
-    else:
-        # fixed number of samples mode
-        if file_format == "text":
-            with open(output_file, 'w') as f:
-                for _ in range(num_samples):
-                    ip = rand_ipv4()
-                    f.write("{}\n".format(ip))
-        else:
-            with open(output_file, 'wb') as f:
-                for _ in range(num_samples):
-                    ip = rand_ipv4()
-                    f.write(ipv4_to_packed(ip))
+    print(f"Generating {'up to '+str(num_samples) if not duration else f'for {duration} seconds'} "
+          f"IPv4 addresses in {file_format} format to {output_file}...")
 
-    print("Data generation complete.")
+    # Specify batch size for each generation
+    batch_size = 10000 
+
+    # Compute the time limit if duration is specified
+    start = time.time()
+    end = start + duration if duration else None
+    
+    # Counter for written samples
+    written = 0
+
+    mode = 'wb' if file_format == 'bin' else 'w'
+    with open(output_file, mode) as f:
+        
+        while( (duration and time.time() < end) or         # Check time limit
+              (not duration and written < num_samples)):   # Check sample limit
+            # Generate a batch
+            remaining = (num_samples - written) if not duration else batch_size
+            count = min(batch_size, remaining)
+
+            if file_format == "text":
+                ips = rand_ipv4_string_batch(count)
+                f.write("\n".join(ips) + "\n")
+            else:
+                f.write(rand_ipv4_bin_batch(count))
+            written += count
+    print(f"Data generation complete. {written:,} IPs written.")
+
 if __name__ == "__main__":
     main()
