@@ -21,17 +21,14 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Output file %s does not exist.\n", argv[1]);
         return -1;
     }
-    
+
     /* Parse and validate epsilon and delta */
     char *endptr;
-    errno = 0;
     double epsilon = strtod(argv[3], &endptr);
     if (endptr == argv[3] || *endptr != '\0') {
         fprintf(stderr, "Invalid epsilon: '%s' (not a number)\n", argv[3]);
         return -1;
     }
-
-    errno = 0;
     double delta = strtod(argv[4], &endptr);
     if (endptr == argv[4] || *endptr != '\0') {
         fprintf(stderr, "Invalid delta: '%s' (not a number)\n", argv[4]);
