@@ -1,21 +1,25 @@
-#include "main.h"
-
+#include "headers/main.h"
 /*
     * Main function for parallel Count-Min Sketch using MPI
     The program reads IP addresses from a binary file in parallel,
     updates a Count-Min Sketch data structure, and prints debugging information.
     Usage: mpirun -n <num_processes> ./CMsketch <input_file>
 */
+
 int main(int argc, char **argv) {
+    //TODO: check that the arguments are correct and that both the file exist
+
     // Initialize MPI environment
     MPI_Init(&argc, &argv);
 
     MPI_File fh;    // MPI file handle 
     int rank, size; // MPI rank (current process) and size (number of processes)
+    double start_time, end_time;
 
     // Initialize MPI communication, getting rank and size
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+    start_time = MPI_Wtime();
 
     MPI_Offset file_size = 0;
 
@@ -80,6 +84,8 @@ int main(int argc, char **argv) {
     // Batch update Count-Min Sketch with the read IP addresses
     cms_batch_update(cms, buffer, addresses_read);
 
+    end_time = MPI_Wtime();
+
     // Debugging prints
     printf("Rank %d processed %d addresses.\n", rank, addresses_read);
     cms_debug_print(cms);
@@ -88,6 +94,12 @@ int main(int argc, char **argv) {
     free(buffer);
     MPI_File_close(&fh);
     cms_free(cms);
+
+    //Log the info about the runtime
+    if(rank == 0){
+        write_execution_info(argv[2], size, total_addresses, end_time - start_time);
+    }
+    
     MPI_Finalize();
     return 0;
 

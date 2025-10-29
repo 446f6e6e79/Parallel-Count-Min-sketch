@@ -6,8 +6,7 @@ WALLTIME="01:00:00"
 QUEUE="short_cpuQ"
 MEM="16gb"
 PLACEMENT="pack:excl"
-PARAMETERS="parameter_for_program"
-
+PARAMETERS="Parallel-Count-Min-sketch/data/data.bin Parallel-Count-Min-sketch/data/process_info.csv"
 EXECUTABLE="${BASE_DIR}/bin/CMsketch"      # Path to the executable file
 TEMPLATE="${BASE_DIR}/scripts/job_template.sh"
 
@@ -51,8 +50,8 @@ for combo in "${COMBOS[@]}"; do
   echo "Generated $out (NODES=$NODES NCPUS=$NCPUS NP=$NP)"
 
   # Submit to PBS (uncomment to actually submit)
-  # qsub "$out"
+  qsub "$out"
 
   # Optionally remove the temporary file after submission
-  # rm "$out"
+  rm "$out"
 done

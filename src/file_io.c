@@ -1,5 +1,4 @@
 #include "file_io.h"
-
 /*
     Read IP addresses from a binary file using MPI I/O
     The function takes as input:
@@ -9,7 +8,9 @@
         count: number of addresses to read
     The function returns the number of addresses read, or -1 on error.
 */
+
 int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count) {
+    //TODO: Check that the start_index <= BUFFER_SIZE specified in the header
     // Calculate byte offset from the start of the file
     MPI_Offset offset = start_index * IP_SIZE;
     MPI_Offset bytes_to_read = count * (MPI_Offset)IP_SIZE;
@@ -35,7 +36,7 @@ int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset
         n_process,total_size,time_seconds
     Each execution will append a new line to the file.
 */
-int write_execution_info(const char *filename, int n_process, size_t total_size, double time_seconds) {
+int write_execution_info(const char *filename, int n_process, MPI_Offset n_elements, double time_seconds) {
     // Open the file in append mode
     FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
@@ -57,7 +58,16 @@ int write_execution_info(const char *filename, int n_process, size_t total_size,
         return -1;
     }
 
-    fprintf(fp, "%d,%zu,%.6f\n", n_process, total_size, time_seconds);
+    // Write the execution info (note: MPI_Offset is typically a long long)
+    if (fprintf(fp, "%d,%lld,%.6f\n", n_process, (long long)n_elements, time_seconds) < 0) {
+        perror("Failed to write to file");
+        flock(fd, LOCK_UN);
+        fclose(fp);
+        return -1;
+    }
+
+    // Flush to ensure the data is actually written
+    fflush(fp);
     
     // Release lock and close the file
     flock(fd, LOCK_UN);       
