@@ -4,10 +4,10 @@
     The program reads IP addresses from a binary file in parallel,
     updates a Count-Min Sketch data structure, and prints debugging information.
     Usage: mpirun -n <num_processes> ./CMsketch <input_file> <output_file> <epsilon> <delta>
+    TODO: create a function to print error messages, that handle also the communication closage
 */
 
 int main(int argc, char **argv) {
-
     // Check the validity of command-line arguments
     if (argc < 5) {
         fprintf(stderr, "Usage: %s <input_file> <output_file> <epsilon> <delta>\n", argv[0]);
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
         return -1;
     }
     if (access(argv[2], F_OK) == -1) {
-        fprintf(stderr, "Output file %s does not exist.\n", argv[1]);
+        fprintf(stderr, "Output file %s does not exist.\n", argv[2]);
         return -1;
     }
 
@@ -39,15 +39,13 @@ int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
 
     MPI_File fh;    // MPI file handle 
-    int rank, size; // MPI rank (current process) and size (number of processes)
+    int rank, comm_sz; // MPI rank (current process) and size (number of processes)
     double start_time, end_time;
 
     // Initialize MPI communication, getting rank and size
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
     start_time = MPI_Wtime();
-
-    MPI_Offset file_size = 0;
 
     // Open the binary file containing IPv4 addresses
     MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
@@ -57,6 +55,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    MPI_Offset file_size = 0;
     // Get the size of the file
     MPI_File_get_size(fh, &file_size);
     if(file_size % IP_SIZE != 0) {
@@ -68,22 +67,18 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    /*
-        Compute the portion of the file each MPI process should handle.
+    // Compute the information neede for parallel reading on the file
 
-        total_addresses: total number of data elements in the file (file_size divided by size of each element)
-        base_address: number of elements each process gets in an even distribution
-        remainder: leftover elements that don't fit evenly
-        start_index: the starting index for this process. Processes with rank < remainder
-                     get one extra element to distribute the leftovers fairly.
-        count: total number of elements this process will handle, which is base_address
-               plus one if the rank is less than remainder (to account for uneven division).
-    */
+    // Total number of data elements in the file (file_size divided by size of each element)
     MPI_Offset total_addresses = file_size / IP_SIZE;
-    MPI_Offset base_address = total_addresses / size;
-    MPI_Offset remainder = total_addresses % size;
-    MPI_Offset start_index = (MPI_Offset)rank * base_address + (rank < remainder ? rank : remainder);
-    MPI_Offset count = base_address + (rank < remainder ? 1 : 0);
+    // Number of elements each process gets in an even distribution
+    MPI_Offset base_address_count = total_addresses / comm_sz;
+    // Leftover elements that don't fit evenly
+    MPI_Offset remainder = total_addresses % comm_sz;
+    // Starting index to read from the file. Add the remainder of other processes as min(rank, remainder)
+    MPI_Offset start_index = (MPI_Offset)rank * base_address_count + (rank < remainder ? rank : remainder);
+    // Number of addresses handled by the process. if rank < remainder, assign 1 extra element
+    MPI_Offset local_addresses = base_address_count + (rank < remainder ? 1 : 0);
 
     // Allocate buffer to read IP addresses. Each process has its own buffer.
     uint8_t *buffer = malloc(BUFFER_SIZE);
@@ -94,14 +89,14 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    // Initialize Count-Min Sketch
+    // Initialize Count-Min Sketch data structure
     CountMinSketch *cms = cms_create_from_error(epsilon, delta);
     
     // Chunked reading and processing
     MPI_Offset total_read = 0;
-    while (total_read < count) {
+    while (total_read < local_addresses) {
         // Remaining IPs to read for this process
-        MPI_Offset remaining = count - total_read;
+        MPI_Offset remaining = local_addresses - total_read;
         // Number of IPs to read in this batch (max BUFFER_IP_COUNT)
         MPI_Offset current_count = (remaining > BUFFER_IP_COUNT) ? BUFFER_IP_COUNT : remaining;
         // Starting index for this batch
@@ -133,10 +128,9 @@ int main(int argc, char **argv) {
 
     //Log the info about the runtime
     if(rank == 0){
-        write_execution_info(argv[2], size, total_addresses, end_time - start_time);
+        write_execution_info(argv[2], comm_sz, total_addresses, end_time - start_time);
     }
     
     MPI_Finalize();
     return 0;
-
 }

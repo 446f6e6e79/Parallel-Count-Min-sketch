@@ -22,10 +22,10 @@ The executable will be generated at `bin/CMsketch`
 
 The program expects input as a **binary file** containing IPv4 addresses, with each IP encoded as **4 bytes** in **network byte order**.
 
-You can generate an artificial dataset with the provided script:
+On the cluster, you can generate an artificial dataset with the provided script:
 
 ```bash
-./scripts/data_generator_job.sh
+qsub scripts/data_generator_job.sh
 ```
 
 #### Parameters (edit inside `data_generator_job.sh` or the python script it calls)
