@@ -1,4 +1,5 @@
 #include "headers/cms.h"
+#include "headers/util.h"
 
 /* 
     Create a Count-Min Sketch from the given error parameters
@@ -131,6 +132,3 @@ void cms_batch_update(CountMinSketch *cms, const uint8_t *keys, size_t n_keys) {
         cms_update(cms, key_int);
     }
 }
-
-
-

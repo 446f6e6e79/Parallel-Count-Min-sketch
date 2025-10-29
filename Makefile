@@ -7,7 +7,7 @@ LDFLAGS ?= -lm
 TARGET  := bin/CMsketch
 
 # Source files
-SRC     := src/main.c src/cms.c src/file_io.c
+SRC     := src/main.c src/cms.c src/file_io.c src/util.c
 
 # Object and dependency directories
 OBJDIR  := src/obj

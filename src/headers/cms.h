@@ -35,5 +35,4 @@ void cms_merge_into(CountMinSketch *dest, const CountMinSketch *src);
 // Debug function to print the Count-Min Sketch table occurrences
 void cms_debug_print(CountMinSketch *cms);
 
-
 #endif
