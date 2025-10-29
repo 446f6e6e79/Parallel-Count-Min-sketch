@@ -10,7 +10,6 @@
   
 /* Existing declarations */
 uint32_t ip_to_int(const uint8_t *ip_addr);
-void cms_free(CountMinSketch *cms);
 
 /* Cleanup helper */
 void safe_cleanup(uint8_t *buffer, CountMinSketch *cms, MPI_File *fh);

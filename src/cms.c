@@ -132,3 +132,13 @@ void cms_batch_update(CountMinSketch *cms, const uint8_t *keys, size_t n_keys) {
         cms_update(cms, key_int);
     }
 }
+
+/*
+    Free all the memory allocated for Count-Min Sketch
+*/
+void cms_free(CountMinSketch *cms) {
+    free(cms->table);
+    free(cms->hash_a);
+    free(cms->hash_b);
+    free(cms);      
+}
