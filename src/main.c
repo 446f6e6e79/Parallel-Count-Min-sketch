@@ -3,11 +3,40 @@
     * Main function for parallel Count-Min Sketch using MPI
     The program reads IP addresses from a binary file in parallel,
     updates a Count-Min Sketch data structure, and prints debugging information.
-    Usage: mpirun -n <num_processes> ./CMsketch <input_file>
+    Usage: mpirun -n <num_processes> ./CMsketch <input_file> <output_file> <epsilon> <delta>
 */
 
 int main(int argc, char **argv) {
-    //TODO: check that the arguments are correct and that both the file exist
+
+    // Check the validity of command-line arguments
+    if (argc < 5) {
+        fprintf(stderr, "Usage: %s <input_file> <output_file> <epsilon> <delta>\n", argv[0]);
+        return -1;
+    }
+    if (access(argv[1], F_OK) == -1) {
+        fprintf(stderr, "Input file %s does not exist.\n", argv[1]);
+        return -1;
+    }
+    if (access(argv[2], F_OK) == -1) {
+        fprintf(stderr, "Output file %s does not exist.\n", argv[1]);
+        return -1;
+    }
+    
+    /* Parse and validate epsilon and delta */
+    char *endptr;
+    errno = 0;
+    double epsilon = strtod(argv[3], &endptr);
+    if (endptr == argv[3] || *endptr != '\0') {
+        fprintf(stderr, "Invalid epsilon: '%s' (not a number)\n", argv[3]);
+        return -1;
+    }
+
+    errno = 0;
+    double delta = strtod(argv[4], &endptr);
+    if (endptr == argv[4] || *endptr != '\0') {
+        fprintf(stderr, "Invalid delta: '%s' (not a number)\n", argv[4]);
+        return -1;
+    }
 
     // Initialize MPI environment
     MPI_Init(&argc, &argv);
@@ -67,7 +96,7 @@ int main(int argc, char **argv) {
         MPI_Finalize();
         return -1;
     }
-
+    // TO DO: enormous buffer handler
     // Read the assigned portion of the file into the buffer
     int addresses_read = read_buffer(fh, buffer, start_index, count);
     if (addresses_read == -1) { 
@@ -79,7 +108,7 @@ int main(int argc, char **argv) {
     }
 
     // Initialize Count-Min Sketch
-    CountMinSketch *cms = cms_create_from_error(0.01, 0.99);
+    CountMinSketch *cms = cms_create_from_error(epsilon, delta);
     
     // Batch update Count-Min Sketch with the read IP addresses
     cms_batch_update(cms, buffer, addresses_read);

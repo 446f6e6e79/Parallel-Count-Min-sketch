@@ -6,7 +6,7 @@ WALLTIME="01:00:00"
 QUEUE="short_cpuQ"
 MEM="16gb"
 PLACEMENT="pack:excl"
-PARAMETERS="Parallel-Count-Min-sketch/data/data.bin Parallel-Count-Min-sketch/data/process_info.csv"
+PARAMETERS="Parallel-Count-Min-sketch/data/data.bin Parallel-Count-Min-sketch/data/process_info.csv 0.01 0.99"
 EXECUTABLE="${BASE_DIR}/bin/CMsketch"      # Path to the executable file
 TEMPLATE="${BASE_DIR}/scripts/job_template.sh"
 
