@@ -13,6 +13,6 @@
 #define BUFFER_IP_COUNT (BUFFER_SIZE / IP_SIZE)
 
 int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count);
-int write_execution_info(const char *filename, int n_process, MPI_Offset n_elements, double time_seconds);
+int write_execution_info(const char *filename, int n_process, MPI_Offset n_elements, double time_seconds, double io_time, double compute_time);
 
 #endif
