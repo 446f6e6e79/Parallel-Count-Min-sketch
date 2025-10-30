@@ -9,7 +9,7 @@
 #include <sys/file.h>
 
 #define IP_SIZE 4 // Each IPv4 address is 4 bytes
-#define BUFFER_SIZE 1048576 // 1 MB buffer size
+#define BUFFER_SIZE 67108864 // 64 MB buffer size
 #define BUFFER_IP_COUNT (BUFFER_SIZE / IP_SIZE)
 
 int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count);

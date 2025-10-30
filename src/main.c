@@ -43,6 +43,7 @@ int main(int argc, char **argv) {
     MPI_File fh;    // MPI file handle 
     int rank, comm_sz; // MPI rank (current process) and size (number of processes)
     double start_time, end_time;
+    double io_time = 0.0, compute_time = 0.0;
 
     // Initialize MPI communication, getting rank and size
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -103,13 +104,18 @@ int main(int argc, char **argv) {
         MPI_Offset current_start = start_index + total_read;
 
         // Read the assigned portion of the file into the buffer
+        double io_start = MPI_Wtime();
         int addresses_read = read_buffer(fh, buffer, current_start, current_count);
+        io_time += MPI_Wtime() - io_start;
+
         if (addresses_read == -1) {
             fprintf(stderr, "Error reading buffer on rank %d\n", rank);
             safe_cleanup(buffer, cms, &fh);
             return -1;
         }
+        double compute_start = MPI_Wtime();
         cms_batch_update(cms, buffer, addresses_read);
+        compute_time += MPI_Wtime() - compute_start;
         total_read += addresses_read;
     }
 
@@ -120,7 +126,7 @@ int main(int argc, char **argv) {
 
     //Log the info about the runtime
     if(rank == 0){
-        write_execution_info(argv[2], comm_sz, total_addresses, end_time - start_time);
+        write_execution_info(argv[2], comm_sz, total_addresses, end_time - start_time, io_time, compute_time);
     }
     
     // Cleanup allocated resources

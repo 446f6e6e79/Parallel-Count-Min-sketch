@@ -42,7 +42,7 @@ int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset
         n_process,total_size,time_seconds
     Each execution will append a new line to the file.
 */
-int write_execution_info(const char *filename, int n_process, MPI_Offset n_elements, double time_seconds) {
+int write_execution_info(const char *filename, int n_process, MPI_Offset n_elements, double time_seconds, double io_time, double compute_time) {
     // Open the file in append mode
     FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
