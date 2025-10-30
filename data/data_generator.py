@@ -2,6 +2,8 @@
 import sys
 import random
 import time
+import os
+
 
 def rand_ipv4_string_batch(n):
     """
@@ -17,18 +19,11 @@ def rand_ipv4_string_batch(n):
     ]
 
 def rand_ipv4_bin_batch(n):
-    """
-        Generate a batch of random IPv4 addresses in packed binary format.
-        INPUT:
-            - n -> number of elements in the batch
-        RETURNS:
-            bytearray of n random IPv4 addresses in packed binary format
-    """
-    # 4 bytes per IP, generated from os.urandom (faster than inet_aton per IP)
-    data = bytearray()
-    for _ in range(n):
-        data += bytes([random.randint(1, 254), random.randint(0, 255),
-                       random.randint(0, 255), random.randint(0, 255)])
+    data = bytearray(os.urandom(4 * n))
+    for i in range(n):
+        offset = 4 * i
+        data[offset]     = 192
+        data[offset + 1] = 168
     return data
 
 def main():
@@ -60,7 +55,7 @@ def main():
           f"IPv4 addresses in {file_format} format to {output_file}...")
 
     # Specify batch size for each generation
-    batch_size = 10000 
+    batch_size = 2_097_152    # Since every IP is 4 bytes, this is 8MB per batch
 
     # Compute the time limit if duration is specified
     start = time.time()
