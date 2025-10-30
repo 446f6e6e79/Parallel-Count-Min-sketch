@@ -2,7 +2,7 @@
 
 # Setup common parameters for the multiple job submission
 BASE_DIR="$HOME/Parallel-Count-Min-sketch"
-WALLTIME="01:00:00"
+WALLTIME="06:00:00"
 QUEUE="short_cpuQ"
 MEM="16gb"
 PLACEMENT="pack:excl"
@@ -15,13 +15,13 @@ OUTPUT_DIR="${BASE_DIR}/jobs"
 
 # List of "NODES:NCPUS" combinations to produce
 COMBOS=(
-  "1:1"   # 1 cpu, 1 node.       -> P = 1
-  "1:2"   # 2 cpu, 1 node        -> P = 2
-  "1:4"   # 4 cpu, 1 node        -> P = 4
-  "2:4"   # 4 cpu, 2 nodes       -> P = 8
-  "4:4"   # 4 cpu, 4 nodes       -> P = 16
-  "8:4"   # 8 cpu, 4 nodes       -> P = 32
-  "8:8"   # 8 cpu, 8 nodes       -> P = 64
+  "1:1"    # 1 cpu, 1 node.       -> P = 1
+  "1:2"    # 2 cpu, 1 node        -> P = 2
+  "1:4"    # 4 cpu, 1 node        -> P = 4
+  "1:8"    # 8 cpu, 1 nodes       -> P = 8
+  "2:8"    # 8 cpu, 2 nodes       -> P = 16
+  "2:16"   # 16 cpu, 2 nodes       -> P = 32
+  "4:16"   # 16 cpu, 4 nodes       -> P = 64
 )
 
 # Loop over each combination and generate the corresponding job script

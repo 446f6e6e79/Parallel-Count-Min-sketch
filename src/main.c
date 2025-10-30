@@ -4,6 +4,9 @@
     The program reads IP addresses from a binary file in parallel,
     updates a Count-Min Sketch data structure, and prints debugging information.
     Usage: mpirun -n <num_processes> ./CMsketch <input_file> <output_file> <epsilon> <delta>
+    TODO: 
+        1)ADD timing to different part of the code -> we can sum the time spent in each zone
+        2)PASS number of CPUS and NODE used, to be able to add id to the output
 */
 
 int main(int argc, char **argv) {
