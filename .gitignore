@@ -73,3 +73,4 @@ data/*.txt
 data/*.bin
 .vscode/tasks.json
 .vscode/settings.json
+data/binary_file_to_ip.py
