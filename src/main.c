@@ -107,7 +107,7 @@
         
         // Initial (blocking) read
         double io_start = MPI_Wtime();
-        int addresses_read = read_buffer(fh, buffer_curr, current_start, current_count);
+        int addresses_read = read_buffer(fh, buffer_curr, start_index, BUFFER_IP_COUNT);
         io_time += MPI_Wtime() - io_start;
         if (addresses_read == -1) {
             fprintf(stderr, "Error reading buffer on rank %d\n", rank);
@@ -138,20 +138,20 @@
             double compute_start = MPI_Wtime();
             cms_batch_update(cms, buffer_curr, addresses_read);
             compute_time += MPI_Wtime() - compute_start;
-            total_read += addresses_read;
 
             // Wait for the non-blocking I/O completion
             MPI_Status status;
             double busy_wait_start = MPI_Wtime();
             MPI_Wait(&request, &status);
             busy_wait_time += MPI_Wtime() - busy_wait_start;
-
-            // Swap buffers
-            double *tmp = buffer_curr;
-            buffer_curr = buffer_next;
-            buffer_next = tmp;
             addresses_read = current_count;
             total_read += addresses_read;
+            
+            // Swap buffers
+            uint8_t *tmp = buffer_curr;
+            buffer_curr = buffer_next;
+            buffer_next = tmp;
+            
 
         }
         end_time = MPI_Wtime();

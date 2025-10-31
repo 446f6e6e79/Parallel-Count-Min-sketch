@@ -50,7 +50,7 @@ int non_blocking_read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_inde
     MPI_Offset bytes_to_read = count * (MPI_Offset)IP_SIZE;
 
     // Implement non-blocking read
-    MPI_File_iread_at(fh, offset, buffer, bytes_to_read, MPI_BYTE, request);
+    MPI_File_iread_at_all(fh, offset, buffer, bytes_to_read, MPI_BYTE, request);
     
     return 0; // Return 0 to indicate the read has been initiated
 }

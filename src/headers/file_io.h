@@ -9,11 +9,11 @@
 #include <sys/file.h>
 
 #define IP_SIZE 4 // Each IPv4 address is 4 bytes
-#define BUFFER_SIZE 67108864 // 64 MB buffer size
+#define BUFFER_SIZE 536870912 // 512 MB buffer size
 #define BUFFER_IP_COUNT (BUFFER_SIZE / IP_SIZE)
 
 int read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count);
-int non_blocking_read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count);
+int non_blocking_read_buffer(MPI_File fh, uint8_t *buffer, MPI_Offset start_index, MPI_Offset count, MPI_Request *request);
 int write_execution_info(const char *filename, int n_process, MPI_Offset n_elements, double time_seconds, double io_time, double compute_time, double busy_wait_time);
 
 #endif
